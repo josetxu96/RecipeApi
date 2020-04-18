@@ -17,6 +17,7 @@ func handleRequest(h handler.Handler) {
 	Router.HandleFunc("/breads", h.GetBreads).Methods("GET")
 	Router.HandleFunc("/breads/{bread}", h.GetBread).Methods("GET")
 	Router.HandleFunc("/breads", h.CreateBread).Methods("POST")
+	Router.HandleFunc("/breads/{bread}", h.DeleteBread).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8080", Router))
 }
 

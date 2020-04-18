@@ -16,6 +16,7 @@ type Handler interface {
 	GetBreads(w http.ResponseWriter, req *http.Request)
 	GetBread(w http.ResponseWriter, req *http.Request)
 	CreateBread(w http.ResponseWriter, req *http.Request)
+	DeleteBread(w http.ResponseWriter, req *http.Request)
 }
 
 type store struct {

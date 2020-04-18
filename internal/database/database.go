@@ -48,24 +48,19 @@ func (store *dbStore) GetBreads() ([]*model.BreadRecipe, error) {
 
 func (store *dbStore) GetBread(name string) (model.BreadRecipe, error) {
 
-	row, err := store.db.Query("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads, WHERE name=?", name)
+	row := store.db.QueryRow("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads where name = $1", name)
 
+	bread := model.BreadRecipe{}
+	err := row.Scan(&bread.Name, &bread.Flour, &bread.Water, &bread.Salt, &bread.Yeast, &bread.Milk, &bread.Sugar)
 	if err != nil {
 		return model.BreadRecipe{}, err
 	}
-
-	bread := model.BreadRecipe{}
-
-	if err := row.Scan(&bread.Name, &bread.Flour, &bread.Water, &bread.Salt, &bread.Yeast, &bread.Milk, &bread.Sugar); err != nil {
-		return model.BreadRecipe{}, err
-	}
-
 	return bread, nil
 }
 
 func (store *dbStore) DeleteBread(name string) error {
 
-	_, err := store.db.Exec("DELETE FROM breads, WHERE name=?", name)
+	_, err := store.db.Exec("DELETE FROM breads where name = $1", name)
 	fmt.Println("Deleting file")
 	return err
 
