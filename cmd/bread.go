@@ -4,9 +4,11 @@ import (
 	"RecipeApi/internal/database"
 	"RecipeApi/internal/handler"
 	"database/sql"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 func handleRequest(h handler.Handler) {

@@ -5,10 +5,11 @@ import (
 	model "RecipeApi/internal/model/breadRecipe"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"gopkg.in/go-playground/validator.v9"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type Handler interface {
@@ -123,6 +124,16 @@ func (db *store) CreateBread(w http.ResponseWriter, req *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(breadRecipe)
+}
+
+func (db *store) DeleteBread(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	err := db.db.DeleteBread(params["bread"])
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
 
 func InitHandler(_store database.Store) Handler {

@@ -3,12 +3,14 @@ package database
 import (
 	model "RecipeApi/internal/model/breadRecipe"
 	"database/sql"
+	"fmt"
 )
 
 type Store interface {
 	CreateBread(recipe *model.BreadRecipe) error
 	GetBreads() ([]*model.BreadRecipe, error)
 	GetBread(string) (model.BreadRecipe, error)
+	DeleteBread(name string) error
 }
 
 type dbStore struct {
@@ -17,13 +19,13 @@ type dbStore struct {
 
 func (store *dbStore) CreateBread(recipe *model.BreadRecipe) error {
 
-	_, err := store.db.Query("INSERT INTO breads(Name, Flour, Water, Salt, Yeast, Milk, Sugar) VALUES ($1,$2,$3,$4,$5,$6,$7)", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar)
+	_, err := store.db.Query("INSERT INTO breads(name, flour, water, salt, yeast, milk, sugar) VALUES ($1,$2,$3,$4,$5,$6,$7)", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar)
 	return err
 }
 
 func (store *dbStore) GetBreads() ([]*model.BreadRecipe, error) {
 
-	rows, err := store.db.Query("SELECT name, recipe FROM breads")
+	rows, err := store.db.Query("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads")
 
 	if err != nil {
 		return nil, err
@@ -46,7 +48,7 @@ func (store *dbStore) GetBreads() ([]*model.BreadRecipe, error) {
 
 func (store *dbStore) GetBread(name string) (model.BreadRecipe, error) {
 
-	row, err := store.db.Query("SELECT name, recipe FROM breads, WHERE name=?", name)
+	row, err := store.db.Query("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads, WHERE name=?", name)
 
 	if err != nil {
 		return model.BreadRecipe{}, err
@@ -59,6 +61,14 @@ func (store *dbStore) GetBread(name string) (model.BreadRecipe, error) {
 	}
 
 	return bread, nil
+}
+
+func (store *dbStore) DeleteBread(name string) error {
+
+	_, err := store.db.Exec("DELETE FROM breads, WHERE name=?", name)
+	fmt.Println("Deleting file")
+	return err
+
 }
 
 func InitStore(db *sql.DB) Store {
