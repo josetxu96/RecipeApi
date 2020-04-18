@@ -1,30 +1,27 @@
-package main
+package handler
 
 import (
-	"database/sql"
+	"RecipeApi/internal/database"
+	model "RecipeApi/internal/model/breadRecipe"
 	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
-	"strconv"
-
 	"github.com/gorilla/mux"
 	"gopkg.in/go-playground/validator.v9"
+	"net/http"
+	"strconv"
 )
 
-var DB Store
-
-type BreadRecipe struct {
-	Name  string `json:"name" validate:"required"`
-	Flour int    `json:"flour" validate:"required,numeric"`
-	Water int    `json:"water" validate:"required,numeric"`
-	Salt  int    `json:"salt" validate:"required,numeric"`
-	Yeast int    `json:"yeast" validate:"required,numeric"`
-	Sugar int    `json:"sugar" validate:"numeric"`
-	Milk  int    `json:"milk" validate:"numeric"`
+type Handler interface {
+	GetBreads(w http.ResponseWriter, req *http.Request)
+	GetBread(w http.ResponseWriter, req *http.Request)
+	CreateBread(w http.ResponseWriter, req *http.Request)
 }
 
-func factorice(a1, a2 []float64, f int, i BreadRecipe) BreadRecipe {
+type store struct {
+	db database.Store
+}
+
+func factorice(a1, a2 []float64, f int, i model.BreadRecipe) model.BreadRecipe {
 
 	var factor float64
 
@@ -42,9 +39,9 @@ func factorice(a1, a2 []float64, f int, i BreadRecipe) BreadRecipe {
 	return i
 }
 
-func getBreads(w http.ResponseWriter, req *http.Request) {
+func (db *store) GetBreads(w http.ResponseWriter, req *http.Request) {
 
-	bread, err := DB.GetBreads()
+	bread, err := db.db.GetBreads()
 
 	if err != nil {
 
@@ -58,12 +55,12 @@ func getBreads(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func getBread(w http.ResponseWriter, req *http.Request) {
+func (db *store) GetBread(w http.ResponseWriter, req *http.Request) {
 
 	queries := 0
 	var factor int
 	params := mux.Vars(req)
-	result, err := DB.GetBread(params["bread"])
+	result, err := db.db.GetBread(params["bread"])
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
@@ -80,7 +77,7 @@ func getBread(w http.ResponseWriter, req *http.Request) {
 	arr1 := []float64{flour, water, salt, milk, sugar, yeast}
 	arr2 := []float64{float64(base.Flour), float64(base.Water), float64(base.Salt), float64(base.Milk), float64(base.Sugar), float64(base.Yeast)}
 
-	if base == (BreadRecipe{}) {
+	if base == (model.BreadRecipe{}) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -106,10 +103,10 @@ func getBread(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(base)
 }
 
-func createBread(w http.ResponseWriter, req *http.Request) {
+func (db *store) CreateBread(w http.ResponseWriter, req *http.Request) {
 
 	v := validator.New()
-	var breadRecipe BreadRecipe
+	var breadRecipe model.BreadRecipe
 	_ = json.NewDecoder(req.Body).Decode(&breadRecipe)
 	err := v.Struct(breadRecipe)
 
@@ -119,7 +116,7 @@ func createBread(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = DB.CreateBread(&breadRecipe)
+	err = db.db.CreateBread(&breadRecipe)
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
@@ -128,29 +125,6 @@ func createBread(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(breadRecipe)
 }
 
-func handleRequest() {
-
-	Router := mux.NewRouter().StrictSlash(true)
-	Router.HandleFunc("/breads", getBreads).Methods("GET")
-	Router.HandleFunc("/breads/{bread}", getBread).Methods("GET")
-	Router.HandleFunc("/breads", createBread).Methods("POST")
-	log.Fatal(http.ListenAndServe(":8080", Router))
-}
-
-func main() {
-	connString := "user=jose password=42771618210 dbname=breads sslmode=disable"
-	connection, err := sql.Open("postgres", connString)
-
-	if err != nil {
-		panic(err)
-	}
-	err = connection.Ping()
-
-	if err != nil {
-		panic(err)
-	}
-
-	DB := database.InitStore(connection)
-	handleRequest()
-
+func InitHandler(_store database.Store) Handler {
+	return &store{db: _store}
 }
