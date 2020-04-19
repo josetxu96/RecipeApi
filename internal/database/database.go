@@ -3,7 +3,6 @@ package database
 import (
 	model "RecipeApi/internal/model/breadRecipe"
 	"database/sql"
-	"fmt"
 )
 
 type Store interface {
@@ -11,6 +10,7 @@ type Store interface {
 	GetBreads() ([]*model.BreadRecipe, error)
 	GetBread(string) (model.BreadRecipe, error)
 	DeleteBread(name string) error
+	DeleteBreads() error
 }
 
 type dbStore struct {
@@ -61,9 +61,13 @@ func (store *dbStore) GetBread(name string) (model.BreadRecipe, error) {
 func (store *dbStore) DeleteBread(name string) error {
 
 	_, err := store.db.Exec("DELETE FROM breads where name = $1", name)
-	fmt.Println("Deleting file")
 	return err
 
+}
+
+func (store *dbStore) DeleteBreads() error {
+	_, err := store.db.Exec("DELETE FROM breads")
+	return err
 }
 
 func InitStore(db *sql.DB) Store {

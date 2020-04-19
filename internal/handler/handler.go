@@ -17,6 +17,7 @@ type Handler interface {
 	GetBread(w http.ResponseWriter, req *http.Request)
 	CreateBread(w http.ResponseWriter, req *http.Request)
 	DeleteBread(w http.ResponseWriter, req *http.Request)
+	DeleteBreads(w http.ResponseWriter, req *http.Request)
 }
 
 type store struct {
@@ -130,6 +131,15 @@ func (db *store) CreateBread(w http.ResponseWriter, req *http.Request) {
 func (db *store) DeleteBread(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
 	err := db.db.DeleteBread(params["bread"])
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (db *store) DeleteBreads(w http.ResponseWriter, req *http.Request) {
+	err := db.db.DeleteBreads()
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusInternalServerError)
