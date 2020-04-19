@@ -11,6 +11,7 @@ type Store interface {
 	GetBread(string) (model.BreadRecipe, error)
 	DeleteBread(name string) error
 	DeleteBreads() error
+	UpdateBread(recipe *model.BreadRecipe, name string) error
 }
 
 type dbStore struct {
@@ -20,6 +21,11 @@ type dbStore struct {
 func (store *dbStore) CreateBread(recipe *model.BreadRecipe) error {
 
 	_, err := store.db.Query("INSERT INTO breads(name, flour, water, salt, yeast, milk, sugar) VALUES ($1,$2,$3,$4,$5,$6,$7)", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar)
+	return err
+}
+
+func (store *dbStore) UpdateBread(recipe *model.BreadRecipe, name string) error {
+	_, err := store.db.Exec("UPDATE breads SET (name, flour, water, salt, yeast, milk, sugar) VALUES ($1,$2,$3,$4,$5,$6,$7) WHERE name=$8", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar, name)
 	return err
 }
 
