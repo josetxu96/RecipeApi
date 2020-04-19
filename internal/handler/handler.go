@@ -18,6 +18,7 @@ type Handler interface {
 	CreateBread(w http.ResponseWriter, req *http.Request)
 	DeleteBread(w http.ResponseWriter, req *http.Request)
 	DeleteBreads(w http.ResponseWriter, req *http.Request)
+	UpdateBread(w http.ResponseWriter, req *http.Request)
 }
 
 type store struct {
@@ -123,6 +124,30 @@ func (db *store) CreateBread(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
+		return
+	}
+
+	json.NewEncoder(w).Encode(breadRecipe)
+}
+
+func (db *store) UpdateBread(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	v := validator.New()
+	var breadRecipe model.BreadRecipe
+	_ = json.NewDecoder(req.Body).Decode(&breadRecipe)
+	err := v.Struct(breadRecipe)
+
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error: %v", err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = db.db.UpdateBread(&breadRecipe, params["bread"])
+
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error: %v", err))
+		return
 	}
 
 	json.NewEncoder(w).Encode(breadRecipe)

@@ -25,7 +25,7 @@ func (store *dbStore) CreateBread(recipe *model.BreadRecipe) error {
 }
 
 func (store *dbStore) UpdateBread(recipe *model.BreadRecipe, name string) error {
-	_, err := store.db.Exec("UPDATE breads SET (name, flour, water, salt, yeast, milk, sugar) VALUES ($1,$2,$3,$4,$5,$6,$7) WHERE name=$8", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar, name)
+	_, err := store.db.Exec("UPDATE breads SET name=$1, flour=$2, water=$3, salt=$4, yeast=$5, milk=$6, sugar=$7 WHERE name=$8", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar, name)
 	return err
 }
 
