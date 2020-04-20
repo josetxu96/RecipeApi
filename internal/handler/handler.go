@@ -2,7 +2,7 @@ package handler
 
 import (
 	"RecipeApi/internal/database"
-	model "RecipeApi/internal/model/breadRecipe"
+	model "RecipeApi/internal/model/breadrecipe"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,6 +12,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+// Handler : interface to use handler
 type Handler interface {
 	GetBreads(w http.ResponseWriter, req *http.Request)
 	GetBread(w http.ResponseWriter, req *http.Request)
@@ -19,10 +20,6 @@ type Handler interface {
 	DeleteBread(w http.ResponseWriter, req *http.Request)
 	DeleteBreads(w http.ResponseWriter, req *http.Request)
 	UpdateBread(w http.ResponseWriter, req *http.Request)
-}
-
-type store struct {
-	db database.Store
 }
 
 func factorice(a1, a2 []float64, f int, i model.BreadRecipe) model.BreadRecipe {
@@ -43,9 +40,10 @@ func factorice(a1, a2 []float64, f int, i model.BreadRecipe) model.BreadRecipe {
 	return i
 }
 
-func (db *store) GetBreads(w http.ResponseWriter, req *http.Request) {
+// GetBreads : calls db to get all breads and returns them in json
+func GetBreads(w http.ResponseWriter, req *http.Request) {
 
-	bread, err := db.db.GetBreads()
+	bread, err := database.DB.GetBreads()
 
 	if err != nil {
 
@@ -59,12 +57,13 @@ func (db *store) GetBreads(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func (db *store) GetBread(w http.ResponseWriter, req *http.Request) {
+// GetBread : calls db to get a bread and returns it in json
+func GetBread(w http.ResponseWriter, req *http.Request) {
 
 	queries := 0
 	var factor int
 	params := mux.Vars(req)
-	result, err := db.db.GetBread(params["bread"])
+	result, err := database.DB.GetBread(params["bread"])
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
@@ -107,7 +106,8 @@ func (db *store) GetBread(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(base)
 }
 
-func (db *store) CreateBread(w http.ResponseWriter, req *http.Request) {
+// CreateBread : calls database to create a bread and returns it in json
+func CreateBread(w http.ResponseWriter, req *http.Request) {
 
 	v := validator.New()
 	var breadRecipe model.BreadRecipe
@@ -120,7 +120,7 @@ func (db *store) CreateBread(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = db.db.CreateBread(&breadRecipe)
+	err = database.DB.CreateBread(&breadRecipe)
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
@@ -130,7 +130,9 @@ func (db *store) CreateBread(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(breadRecipe)
 }
 
-func (db *store) UpdateBread(w http.ResponseWriter, req *http.Request) {
+// UpdateBread : calls database to update a bread and returns it in json
+func UpdateBread(w http.ResponseWriter, req *http.Request) {
+
 	params := mux.Vars(req)
 	v := validator.New()
 	var breadRecipe model.BreadRecipe
@@ -143,7 +145,7 @@ func (db *store) UpdateBread(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = db.db.UpdateBread(&breadRecipe, params["bread"])
+	err = database.DB.UpdateBread(&breadRecipe, params["bread"])
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
@@ -153,9 +155,10 @@ func (db *store) UpdateBread(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(breadRecipe)
 }
 
-func (db *store) DeleteBread(w http.ResponseWriter, req *http.Request) {
+// DeleteBread : calls database to delete a bread
+func DeleteBread(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
-	err := db.db.DeleteBread(params["bread"])
+	err := database.DB.DeleteBread(params["bread"])
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusInternalServerError)
@@ -163,15 +166,12 @@ func (db *store) DeleteBread(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (db *store) DeleteBreads(w http.ResponseWriter, req *http.Request) {
-	err := db.db.DeleteBreads()
+// DeleteBreads : calls database to delete all breads
+func DeleteBreads(w http.ResponseWriter, req *http.Request) {
+	err := database.DB.DeleteBreads()
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-}
-
-func InitHandler(_store database.Store) Handler {
-	return &store{db: _store}
 }

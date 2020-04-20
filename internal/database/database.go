@@ -1,10 +1,11 @@
 package database
 
 import (
-	model "RecipeApi/internal/model/breadRecipe"
+	model "RecipeApi/internal/model/breadrecipe"
 	"database/sql"
 )
 
+// Store : database interface
 type Store interface {
 	CreateBread(recipe *model.BreadRecipe) error
 	GetBreads() ([]*model.BreadRecipe, error)
@@ -14,24 +15,31 @@ type Store interface {
 	UpdateBread(recipe *model.BreadRecipe, name string) error
 }
 
-type dbStore struct {
-	db *sql.DB
+// DbStore : database struct
+type DbStore struct {
+	Db *sql.DB
 }
 
-func (store *dbStore) CreateBread(recipe *model.BreadRecipe) error {
+// DB : database
+var DB Store
 
-	_, err := store.db.Query("INSERT INTO breads(name, flour, water, salt, yeast, milk, sugar) VALUES ($1,$2,$3,$4,$5,$6,$7)", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar)
+// CreateBread : adds a bread to the database
+func (store *DbStore) CreateBread(recipe *model.BreadRecipe) error {
+
+	_, err := store.Db.Query("INSERT INTO breads(name, flour, water, salt, yeast, milk, sugar) VALUES ($1,$2,$3,$4,$5,$6,$7)", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar)
 	return err
 }
 
-func (store *dbStore) UpdateBread(recipe *model.BreadRecipe, name string) error {
-	_, err := store.db.Exec("UPDATE breads SET name=$1, flour=$2, water=$3, salt=$4, yeast=$5, milk=$6, sugar=$7 WHERE name=$8", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar, name)
+// UpdateBread : updates a bread from the database
+func (store *DbStore) UpdateBread(recipe *model.BreadRecipe, name string) error {
+	_, err := store.Db.Exec("UPDATE breads SET name=$1, flour=$2, water=$3, salt=$4, yeast=$5, milk=$6, sugar=$7 WHERE name=$8", recipe.Name, recipe.Flour, recipe.Water, recipe.Salt, recipe.Yeast, recipe.Milk, recipe.Sugar, name)
 	return err
 }
 
-func (store *dbStore) GetBreads() ([]*model.BreadRecipe, error) {
+// GetBreads : gets all breads from the database
+func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
 
-	rows, err := store.db.Query("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads")
+	rows, err := store.Db.Query("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads")
 
 	if err != nil {
 		return nil, err
@@ -52,9 +60,10 @@ func (store *dbStore) GetBreads() ([]*model.BreadRecipe, error) {
 	return breads, nil
 }
 
-func (store *dbStore) GetBread(name string) (model.BreadRecipe, error) {
+// GetBread : gets a bread from the database
+func (store *DbStore) GetBread(name string) (model.BreadRecipe, error) {
 
-	row := store.db.QueryRow("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads where name = $1", name)
+	row := store.Db.QueryRow("SELECT name, flour, water, salt, yeast, milk, sugar FROM breads where name = $1", name)
 
 	bread := model.BreadRecipe{}
 	err := row.Scan(&bread.Name, &bread.Flour, &bread.Water, &bread.Salt, &bread.Yeast, &bread.Milk, &bread.Sugar)
@@ -64,18 +73,21 @@ func (store *dbStore) GetBread(name string) (model.BreadRecipe, error) {
 	return bread, nil
 }
 
-func (store *dbStore) DeleteBread(name string) error {
+// DeleteBread : deletes a bread from the database
+func (store *DbStore) DeleteBread(name string) error {
 
-	_, err := store.db.Exec("DELETE FROM breads where name = $1", name)
+	_, err := store.Db.Exec("DELETE FROM breads where name = $1", name)
 	return err
 
 }
 
-func (store *dbStore) DeleteBreads() error {
-	_, err := store.db.Exec("DELETE FROM breads")
+// DeleteBreads : deletes all breads from the database
+func (store *DbStore) DeleteBreads() error {
+	_, err := store.Db.Exec("DELETE FROM breads")
 	return err
 }
 
-func InitStore(db *sql.DB) Store {
-	return &dbStore{db: db}
+// InitStore : starts the store
+func InitStore(s Store) {
+	DB = s
 }

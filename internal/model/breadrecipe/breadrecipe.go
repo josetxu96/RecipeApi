@@ -1,5 +1,6 @@
-package breadRecipe
+package breadrecipe
 
+// BreadRecipe : bread recipes model
 type BreadRecipe struct {
 	Name  string `json:"name" validate:"required"`
 	Flour int    `json:"flour" validate:"required,numeric"`
