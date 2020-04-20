@@ -8,7 +8,7 @@ import (
 )
 
 // GetBreads : calls db to get all breads and returns them in json
-func GetBreads(w http.ResponseWriter, req *http.Request) {
+func getBreads(w http.ResponseWriter, req *http.Request) {
 
 	bread, err := database.DB.GetBreads()
 

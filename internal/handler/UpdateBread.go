@@ -11,8 +11,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// UpdateBread : calls database to update a bread and returns it in json
-func UpdateBread(w http.ResponseWriter, req *http.Request) {
+func updateBread(w http.ResponseWriter, req *http.Request) {
 
 	params := mux.Vars(req)
 	v := validator.New()

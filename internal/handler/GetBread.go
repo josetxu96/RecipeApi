@@ -11,8 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetBread : calls db to get a bread and returns it in json
-func GetBread(w http.ResponseWriter, req *http.Request) {
+func getBread(w http.ResponseWriter, req *http.Request) {
 
 	queries := 0
 	var factor int

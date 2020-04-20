@@ -10,8 +10,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// CreateBread : calls database to create a bread and returns it in json
-func CreateBread(w http.ResponseWriter, req *http.Request) {
+func createBread(w http.ResponseWriter, req *http.Request) {
 
 	v := validator.New()
 	var breadRecipe model.BreadRecipe

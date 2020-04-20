@@ -8,8 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// DeleteBread : calls database to delete a bread
-func DeleteBread(w http.ResponseWriter, req *http.Request) {
+func deleteBread(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
 	err := database.DB.DeleteBread(params["bread"])
 	if err != nil {
