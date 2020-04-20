@@ -24,5 +24,3 @@ func main() {
 	database.InitStore(&database.DbStore{Db: dbPostgres})
 	handler.HandleRequest()
 }
-
-//docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=42771618210 -e POSTGRES_USER=jose -d postgres
