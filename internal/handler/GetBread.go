@@ -36,7 +36,7 @@ func getBread(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	arr1 := []float64{flour, water, salt, milk, sugar, yeast}
-	arr2 := []float64{float64(base.Flour), float64(base.Water), float64(base.Salt), float64(base.Milk), float64(base.Sugar), float64(base.Yeast)}
+	arr2 := []float64{float64(base.Ingredients.Flour), float64(base.Ingredients.Water), float64(base.Ingredients.Salt), float64(base.Ingredients.Milk), float64(base.Ingredients.Sugar), float64(base.Ingredients.Yeast)}
 
 	if base == (model.BreadRecipe{}) {
 		w.WriteHeader(http.StatusNotFound)
@@ -72,12 +72,12 @@ func factorice(a1, a2 []float64, f int, i model.BreadRecipe) model.BreadRecipe {
 		factor = a1[f] / a2[f]
 	}
 
-	i.Flour = int(float64(i.Flour) * factor)
-	i.Water = int(float64(i.Water) * factor)
-	i.Salt = int(float64(i.Salt) * factor)
-	i.Yeast = int(float64(i.Yeast) * factor)
-	i.Sugar = int(float64(i.Sugar) * factor)
-	i.Milk = int(float64(i.Milk) * factor)
+	i.Ingredients.Flour = int(float64(i.Ingredients.Flour) * factor)
+	i.Ingredients.Water = int(float64(i.Ingredients.Water) * factor)
+	i.Ingredients.Salt = int(float64(i.Ingredients.Salt) * factor)
+	i.Ingredients.Yeast = int(float64(i.Ingredients.Yeast) * factor)
+	i.Ingredients.Sugar = int(float64(i.Ingredients.Sugar) * factor)
+	i.Ingredients.Milk = int(float64(i.Ingredients.Milk) * factor)
 
 	return i
 }
