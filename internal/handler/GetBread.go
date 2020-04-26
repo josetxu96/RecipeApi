@@ -24,17 +24,12 @@ func getBread(w http.ResponseWriter, req *http.Request) {
 	}
 	base := result
 	v := req.URL.Query()
-	flour, err := strconv.ParseFloat(v.Get("flour"), 64)
-	water, err := strconv.ParseFloat(v.Get("water"), 64)
-	salt, err := strconv.ParseFloat(v.Get("salt"), 64)
-	yeast, err := strconv.ParseFloat(v.Get("yeast"), 64)
-	milk, err := strconv.ParseFloat(v.Get("milk"), 64)
-	sugar, err := strconv.ParseFloat(v.Get("sugar"), 64)
-	if err != nil {
-		fmt.Println(fmt.Errorf("Error: %v", err))
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	flour, _ := strconv.ParseFloat(v.Get("flour"), 64)
+	water, _ := strconv.ParseFloat(v.Get("water"), 64)
+	salt, _ := strconv.ParseFloat(v.Get("salt"), 64)
+	yeast, _ := strconv.ParseFloat(v.Get("yeast"), 64)
+	milk, _ := strconv.ParseFloat(v.Get("milk"), 64)
+	sugar, _ := strconv.ParseFloat(v.Get("sugar"), 64)
 	arr1 := []float64{flour, water, salt, milk, sugar, yeast}
 	arr2 := []float64{float64(base.Ingredients.Flour), float64(base.Ingredients.Water), float64(base.Ingredients.Salt), float64(base.Ingredients.Milk), float64(base.Ingredients.Sugar), float64(base.Ingredients.Yeast)}
 
