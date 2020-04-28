@@ -25,7 +25,7 @@ func updateRecipe(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = database.DB.UpdateRecipe(&recipe, params["bread"])
+	err = database.DB.UpdateRecipe(&recipe, params["recipe"])
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
