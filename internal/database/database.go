@@ -27,21 +27,21 @@ var DB Store
 // CreateBread : adds a bread to the database
 func (store *DbStore) CreateBread(recipe *model.BreadRecipe) error {
 	s, _ := json.Marshal(recipe.Ingredients)
-	_, err := store.Db.Query("INSERT INTO breads(name, description, ingredients) VALUES ($1,$2,$3)", recipe.Name, recipe.Description, s)
+	_, err := store.Db.Query("INSERT INTO breads(name, description, ingredients, people) VALUES ($1,$2,$3,$4)", recipe.Name, recipe.Description, s, recipe.People)
 	return err
 }
 
 // UpdateBread : updates a bread from the database
 func (store *DbStore) UpdateBread(recipe *model.BreadRecipe, name string) error {
 	s, _ := json.Marshal(recipe.Ingredients)
-	_, err := store.Db.Exec("UPDATE breads SET name=$1, description=$2, ingredients=$3 WHERE name=$4", recipe.Name, recipe.Description, s, name)
+	_, err := store.Db.Exec("UPDATE breads SET name=$1, description=$2, ingredients=$3, people=$4 WHERE name=$5", recipe.Name, recipe.Description, s, recipe.People, name)
 	return err
 }
 
 // GetBreads : gets all breads from the database
 func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
 
-	rows, err := store.Db.Query("SELECT name, description, ingredients FROM breads")
+	rows, err := store.Db.Query("SELECT name, description, ingredients, people FROM breads")
 
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
 
 		bread := &model.BreadRecipe{}
 		var s []byte
-		if err := rows.Scan(&bread.Name, &bread.Description, &s); err != nil {
+		if err := rows.Scan(&bread.Name, &bread.Description, &s, &bread.People); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(s, &bread.Ingredients)
@@ -65,11 +65,11 @@ func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
 // GetBread : gets a bread from the database
 func (store *DbStore) GetBread(name string) (model.BreadRecipe, error) {
 
-	row := store.Db.QueryRow("SELECT name, description, ingredients FROM breads where name = $1", name)
+	row := store.Db.QueryRow("SELECT name, description, ingredients, people FROM breads where name = $1", name)
 
 	bread := model.BreadRecipe{}
 	var s []byte
-	err := row.Scan(&bread.Name, &bread.Description, &s)
+	err := row.Scan(&bread.Name, &bread.Description, &s, &bread.People)
 	if err != nil {
 		return model.BreadRecipe{}, err
 	}
