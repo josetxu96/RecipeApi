@@ -2,7 +2,7 @@ package handler
 
 import (
 	"RecipeApi/internal/database"
-	model "RecipeApi/internal/model/breadrecipe"
+	model "RecipeApi/internal/model/recipe"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,13 +11,13 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-func updateBread(w http.ResponseWriter, req *http.Request) {
+func updateRecipe(w http.ResponseWriter, req *http.Request) {
 
 	params := mux.Vars(req)
 	v := validator.New()
-	var breadRecipe model.BreadRecipe
-	_ = json.NewDecoder(req.Body).Decode(&breadRecipe)
-	err := v.Struct(breadRecipe)
+	var recipe model.Recipe
+	_ = json.NewDecoder(req.Body).Decode(&recipe)
+	err := v.Struct(recipe)
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
@@ -25,12 +25,12 @@ func updateBread(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = database.DB.UpdateBread(&breadRecipe, params["bread"])
+	err = database.DB.UpdateBread(&recipe, params["bread"])
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		return
 	}
 
-	json.NewEncoder(w).Encode(breadRecipe)
+	json.NewEncoder(w).Encode(recipe)
 }

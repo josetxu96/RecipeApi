@@ -2,7 +2,7 @@ package handler
 
 import (
 	"RecipeApi/internal/database"
-	model "RecipeApi/internal/model/breadrecipe"
+	model "RecipeApi/internal/model/recipe"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,14 +11,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func getBread(w http.ResponseWriter, req *http.Request) {
+func getRecipe(w http.ResponseWriter, req *http.Request) {
 
 	queries := 0
 	var factor float64
 	var arr1 []float64
 	var arr2 []float64
 	params := mux.Vars(req)
-	result, err := database.DB.GetBread(params["bread"])
+	result, err := database.DB.GetBread(params["recipe"])
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
@@ -61,7 +61,7 @@ func getBread(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func factorice(a1, a2 []float64, f float64, i model.BreadRecipe, people bool) model.BreadRecipe {
+func factorice(a1, a2 []float64, f float64, i model.Recipe, people bool) model.Recipe {
 
 	var factor float64
 	if people {

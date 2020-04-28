@@ -7,10 +7,9 @@ import (
 	"net/http"
 )
 
-// GetBreads : calls db to get all breads and returns them in json
-func getBreads(w http.ResponseWriter, req *http.Request) {
+func getRecipes(w http.ResponseWriter, req *http.Request) {
 
-	bread, err := database.DB.GetBreads()
+	recipe, err := database.DB.GetRecipes()
 
 	if err != nil {
 
@@ -20,6 +19,6 @@ func getBreads(w http.ResponseWriter, req *http.Request) {
 
 	}
 
-	json.NewEncoder(w).Encode(bread)
+	json.NewEncoder(w).Encode(recipe)
 
 }

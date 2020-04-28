@@ -1,19 +1,19 @@
 package database
 
 import (
-	model "RecipeApi/internal/model/breadrecipe"
+	model "RecipeApi/internal/model/recipe"
 	"database/sql"
 	"encoding/json"
 )
 
 // Store : database interface
 type Store interface {
-	CreateBread(recipe *model.BreadRecipe) error
-	GetBreads() ([]*model.BreadRecipe, error)
-	GetBread(string) (model.BreadRecipe, error)
-	DeleteBread(name string) error
-	DeleteBreads() error
-	UpdateBread(recipe *model.BreadRecipe, name string) error
+	CreateRecipe(recipe *model.Recipe) error
+	Getrecipes() ([]*model.Recipe, error)
+	Getrecipe(string) (model.Recipe, error)
+	Deleterecipe(name string) error
+	Deleterecipes() error
+	Updaterecipe(recipe *model.Recipe, name string) error
 }
 
 // DbStore : database struct
@@ -24,70 +24,70 @@ type DbStore struct {
 // DB : database
 var DB Store
 
-// CreateBread : adds a bread to the database
-func (store *DbStore) CreateBread(recipe *model.BreadRecipe) error {
+// Createrecipe : adds a recipe to the database
+func (store *DbStore) CreateRecipe(recipe *model.Recipe) error {
 	s, _ := json.Marshal(recipe.Ingredients)
-	_, err := store.Db.Query("INSERT INTO breads(name, description, ingredients, people) VALUES ($1,$2,$3,$4)", recipe.Name, recipe.Description, s, recipe.People)
+	_, err := store.Db.Query("INSERT INTO recipes(name, description, ingredients, people) VALUES ($1,$2,$3,$4)", recipe.Name, recipe.Description, s, recipe.People)
 	return err
 }
 
-// UpdateBread : updates a bread from the database
-func (store *DbStore) UpdateBread(recipe *model.BreadRecipe, name string) error {
+// Updaterecipe : updates a recipe from the database
+func (store *DbStore) UpdateRecipe(recipe *model.Recipe, name string) error {
 	s, _ := json.Marshal(recipe.Ingredients)
-	_, err := store.Db.Exec("UPDATE breads SET name=$1, description=$2, ingredients=$3, people=$4 WHERE name=$5", recipe.Name, recipe.Description, s, recipe.People, name)
+	_, err := store.Db.Exec("UPDATE recipes SET name=$1, description=$2, ingredients=$3, people=$4 WHERE name=$5", recipe.Name, recipe.Description, s, recipe.People, name)
 	return err
 }
 
-// GetBreads : gets all breads from the database
-func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
+// Getrecipes : gets all recipes from the database
+func (store *DbStore) GetRecipes() ([]*model.Recipe, error) {
 
-	rows, err := store.Db.Query("SELECT name, description, ingredients, people FROM breads")
+	rows, err := store.Db.Query("SELECT name, description, ingredients, people FROM recipes")
 
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	breads := []*model.BreadRecipe{}
+	recipes := []*model.Recipe{}
 	for rows.Next() {
 
-		bread := &model.BreadRecipe{}
+		recipe := &model.Recipe{}
 		var s []byte
-		if err := rows.Scan(&bread.Name, &bread.Description, &s, &bread.People); err != nil {
+		if err := rows.Scan(&recipe.Name, &recipe.Description, &s, &recipe.People); err != nil {
 			return nil, err
 		}
-		json.Unmarshal(s, &bread.Ingredients)
-		breads = append(breads, bread)
+		json.Unmarshal(s, &recipe.Ingredients)
+		recipes = append(recipes, recipe)
 	}
-	return breads, nil
+	return recipes, nil
 }
 
-// GetBread : gets a bread from the database
-func (store *DbStore) GetBread(name string) (model.BreadRecipe, error) {
+// Getrecipe : gets a recipe from the database
+func (store *DbStore) GetRecipe(name string) (model.Recipe, error) {
 
-	row := store.Db.QueryRow("SELECT name, description, ingredients, people FROM breads where name = $1", name)
+	row := store.Db.QueryRow("SELECT name, description, ingredients, people FROM recipes where name = $1", name)
 
-	bread := model.BreadRecipe{}
+	recipe := model.Recipe{}
 	var s []byte
-	err := row.Scan(&bread.Name, &bread.Description, &s, &bread.People)
+	err := row.Scan(&recipe.Name, &recipe.Description, &s, &recipe.People)
 	if err != nil {
-		return model.BreadRecipe{}, err
+		return model.Recipe{}, err
 	}
-	json.Unmarshal(s, &bread.Ingredients)
-	return bread, nil
+	json.Unmarshal(s, &recipe.Ingredients)
+	return recipe, nil
 }
 
-// DeleteBread : deletes a bread from the database
-func (store *DbStore) DeleteBread(name string) error {
+// Deleterecipe : deletes a recipe from the database
+func (store *DbStore) DeleteRecipe(name string) error {
 
-	_, err := store.Db.Exec("DELETE FROM breads where name = $1", name)
+	_, err := store.Db.Exec("DELETE FROM recipes where name = $1", name)
 	return err
 
 }
 
-// DeleteBreads : deletes all breads from the database
-func (store *DbStore) DeleteBreads() error {
-	_, err := store.Db.Exec("DELETE FROM breads")
+// Deleterecipes : deletes all recipes from the database
+func (store *DbStore) DeleteRecipes() error {
+	_, err := store.Db.Exec("DELETE FROM recipes")
 	return err
 }
 

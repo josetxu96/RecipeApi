@@ -11,11 +11,11 @@ import (
 func HandleRequest() {
 
 	Router := mux.NewRouter().StrictSlash(true)
-	Router.HandleFunc("/breads", getBreads).Methods("GET")
-	Router.HandleFunc("/breads/{bread}", getBread).Methods("GET")
-	Router.HandleFunc("/breads", createBread).Methods("POST")
-	Router.HandleFunc("/breads/{bread}", updateBread).Methods("PUT")
-	Router.HandleFunc("/breads/{bread}", deleteBread).Methods("DELETE")
-	Router.HandleFunc("/breads", deleteBreads).Methods("DELETE")
+	Router.HandleFunc("/recipes", getRecipes).Methods("GET")
+	Router.HandleFunc("/recipes/{recipe}", getRecipe).Methods("GET")
+	Router.HandleFunc("/recipes", createrecipe).Methods("POST")
+	Router.HandleFunc("/recipes/{recipe}", updateRecipe).Methods("PUT")
+	Router.HandleFunc("/recipes/{recipe}", deleteRecipe).Methods("DELETE")
+	Router.HandleFunc("/recipes", deleteRecipes).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8080", Router))
 }

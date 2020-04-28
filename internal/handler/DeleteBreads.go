@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func deleteBreads(w http.ResponseWriter, req *http.Request) {
-	err := database.DB.DeleteBreads()
+func deleteRecipes(w http.ResponseWriter, req *http.Request) {
+	err := database.DB.DeleteRecipe()
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusInternalServerError)
