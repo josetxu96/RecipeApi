@@ -18,7 +18,7 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 	var arr1 []float64
 	var arr2 []float64
 	params := mux.Vars(req)
-	result, err := database.DB.GetBread(params["recipe"])
+	result, err := database.DB.GetRecipe(params["recipe"])
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))
 		w.WriteHeader(http.StatusBadRequest)

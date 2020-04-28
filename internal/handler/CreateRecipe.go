@@ -23,7 +23,7 @@ func createRecipe(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = database.DB.CreateBread(&recipe)
+	err = database.DB.CreateRecipe(&recipe)
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error: %v", err))

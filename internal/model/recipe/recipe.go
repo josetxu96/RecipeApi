@@ -1,7 +1,7 @@
 package Recipe
 
 // Recipe : recipes model
-type BreadRecipe struct {
+type Recipe struct {
 	Name        string         `json:"name" validate:"required"`
 	Description string         `json:"description" validate:"required"`
 	People      int            `json:"people" validate:"required"`

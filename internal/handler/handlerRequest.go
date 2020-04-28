@@ -13,7 +13,7 @@ func HandleRequest() {
 	Router := mux.NewRouter().StrictSlash(true)
 	Router.HandleFunc("/recipes", getRecipes).Methods("GET")
 	Router.HandleFunc("/recipes/{recipe}", getRecipe).Methods("GET")
-	Router.HandleFunc("/recipes", createrecipe).Methods("POST")
+	Router.HandleFunc("/recipes", createRecipe).Methods("POST")
 	Router.HandleFunc("/recipes/{recipe}", updateRecipe).Methods("PUT")
 	Router.HandleFunc("/recipes/{recipe}", deleteRecipe).Methods("DELETE")
 	Router.HandleFunc("/recipes", deleteRecipes).Methods("DELETE")
