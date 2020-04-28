@@ -3,6 +3,7 @@ package database
 import (
 	model "RecipeApi/internal/model/breadrecipe"
 	"database/sql"
+	"encoding/json"
 )
 
 // Store : database interface
@@ -25,21 +26,22 @@ var DB Store
 
 // CreateBread : adds a bread to the database
 func (store *DbStore) CreateBread(recipe *model.BreadRecipe) error {
-
-	_, err := store.Db.Query("INSERT INTO breads(name, description, flour, water, salt, yeast, milk, sugar) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", recipe.Name, recipe.Description, recipe.Ingredients.Flour, recipe.Ingredients.Water, recipe.Ingredients.Salt, recipe.Ingredients.Yeast, recipe.Ingredients.Milk, recipe.Ingredients.Sugar)
+	s, _ := json.Marshal(recipe.Ingredients)
+	_, err := store.Db.Query("INSERT INTO breads(name, description, ingredients) VALUES ($1,$2,$3)", recipe.Name, recipe.Description, s)
 	return err
 }
 
 // UpdateBread : updates a bread from the database
 func (store *DbStore) UpdateBread(recipe *model.BreadRecipe, name string) error {
-	_, err := store.Db.Exec("UPDATE breads SET name=$1, description=$2, flour=$3, water=$4, salt=$5, yeast=$6, milk=$7, sugar=$8 WHERE name=$9", recipe.Name, recipe.Description, recipe.Ingredients.Flour, recipe.Ingredients.Water, recipe.Ingredients.Salt, recipe.Ingredients.Yeast, recipe.Ingredients.Milk, recipe.Ingredients.Sugar, name)
+	s, _ := json.Marshal(recipe.Ingredients)
+	_, err := store.Db.Exec("UPDATE breads SET name=$1, description=$2, ingredients=$3 WHERE name=$4", recipe.Name, recipe.Description, s, name)
 	return err
 }
 
 // GetBreads : gets all breads from the database
 func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
 
-	rows, err := store.Db.Query("SELECT name, description, flour, water, salt, yeast, milk, sugar FROM breads")
+	rows, err := store.Db.Query("SELECT name, description, ingredients FROM breads")
 
 	if err != nil {
 		return nil, err
@@ -50,11 +52,11 @@ func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
 	for rows.Next() {
 
 		bread := &model.BreadRecipe{}
-
-		if err := rows.Scan(&bread.Name, &bread.Description, &bread.Ingredients.Flour, &bread.Ingredients.Water, &bread.Ingredients.Salt, &bread.Ingredients.Yeast, &bread.Ingredients.Milk, &bread.Ingredients.Sugar); err != nil {
+		var s []byte
+		if err := rows.Scan(&bread.Name, &bread.Description, &s); err != nil {
 			return nil, err
 		}
-
+		json.Unmarshal(s, &bread.Ingredients)
 		breads = append(breads, bread)
 	}
 	return breads, nil
@@ -63,13 +65,15 @@ func (store *DbStore) GetBreads() ([]*model.BreadRecipe, error) {
 // GetBread : gets a bread from the database
 func (store *DbStore) GetBread(name string) (model.BreadRecipe, error) {
 
-	row := store.Db.QueryRow("SELECT name, description, flour, water, salt, yeast, milk, sugar FROM breads where name = $1", name)
+	row := store.Db.QueryRow("SELECT name, description, ingredients FROM breads where name = $1", name)
 
 	bread := model.BreadRecipe{}
-	err := row.Scan(&bread.Name, &bread.Description, &bread.Ingredients.Flour, &bread.Ingredients.Water, &bread.Ingredients.Salt, &bread.Ingredients.Yeast, &bread.Ingredients.Milk, &bread.Ingredients.Sugar)
+	var s []byte
+	err := row.Scan(&bread.Name, &bread.Description, &s)
 	if err != nil {
 		return model.BreadRecipe{}, err
 	}
+	json.Unmarshal(s, &bread.Ingredients)
 	return bread, nil
 }
 
