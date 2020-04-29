@@ -30,7 +30,7 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 
 	for key, value := range result.Ingredients {
 		f, _ := strconv.ParseFloat(v.Get(key), 64)
-		arr2 = append(arr2, float64(value))
+		arr2 = append(arr2, float64(value.Quantity))
 		arr1 = append(arr1, f)
 	}
 
@@ -72,7 +72,10 @@ func factorice(a1, a2 []float64, f float64, i model.Recipe, people bool) model.R
 	}
 
 	for key := range i.Ingredients {
-		i.Ingredients[key] = int(float64(i.Ingredients[key]) * factor)
+		i.Ingredients[key].Quantity = int(float64(i.Ingredients[key].Quantity) * factor)
+		if i.Ingredients[key].Quantity == 0 {
+			i.Ingredients[key].Quantity = 1
+		}
 	}
 	return i
 }
