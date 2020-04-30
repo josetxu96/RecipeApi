@@ -17,6 +17,7 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 	var factor float64
 	var arr1 []float64
 	var arr2 []float64
+	var p float64
 	params := mux.Vars(req)
 	result, err := database.DB.GetRecipe(params["recipe"])
 	if err != nil {
@@ -26,8 +27,14 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 	}
 
 	v := req.URL.Query()
-	p, _ := strconv.ParseFloat(v.Get("people"), 64)
-
+	if v.Get("people") != "" {
+		p, err = strconv.ParseFloat(v.Get("people"), 64)
+	}
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error: %v", err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	for k := range v {
 		if _, ok := result.Ingredients[k]; !ok {
 			if k != "people" {
@@ -40,7 +47,15 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 		if v.Get(key) == "0" {
 			queries++
 		}
-		f, _ := strconv.ParseFloat(v.Get(key), 64)
+		f := 0.0
+		if v.Get(key) != "" {
+			f, err = strconv.ParseFloat(v.Get(key), 64)
+		}
+		if err != nil {
+			fmt.Println(fmt.Errorf("Error: %v", err))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 		arr2 = append(arr2, float64(value.Quantity))
 		arr1 = append(arr1, f)
 	}
