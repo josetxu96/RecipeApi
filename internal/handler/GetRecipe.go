@@ -28,7 +28,18 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 	v := req.URL.Query()
 	p, _ := strconv.ParseFloat(v.Get("people"), 64)
 
+	for k := range v {
+		if _, ok := result.Ingredients[k]; !ok {
+			if k != "people" {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+		}
+	}
 	for key, value := range result.Ingredients {
+		if v.Get(key) == "0" {
+			queries++
+		}
 		f, _ := strconv.ParseFloat(v.Get(key), 64)
 		arr2 = append(arr2, float64(value.Quantity))
 		arr1 = append(arr1, f)
@@ -39,8 +50,10 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 		if v > 0 {
 			factor = float64(index)
 			queries++
+		} else if v < 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
-
 	}
 
 	if queries > 1 {
@@ -57,6 +70,9 @@ func getRecipe(w http.ResponseWriter, req *http.Request) {
 		factor = p / float64(result.People)
 		result = factorice(arr1, arr2, factor, result, true)
 		result.People = int(p)
+	} else if v.Get("people") == "0" || p < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	json.NewEncoder(w).Encode(result)
 }
